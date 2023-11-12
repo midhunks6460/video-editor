@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Video Editor</title>
+</head>
+<body>
+    <h1>Simple Video Editor</h1>
+    <input type="file" id="videoInput" accept="video/*">
+    <button onclick="uploadVideo()">Upload Video</button>
+
+    <div id="videoPlayerContainer">
+        <video id="videoPlayer" controls></video>
+    </div>
+
+    <script>
+        function uploadVideo() {
+            const input = document.getElementById('videoInput');
+            const file = input.files[0];
+
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const videoPlayer = document.getElementById('videoPlayer');
+                        videoPlayer.src = `/uploads/${data.filename}`;
+                        videoPlayer.load();
+                    } else {
+                        console.error(data.error);
+                    }
+                })
+                .catch(error => console.error(error));
+            }
+        }
+    </script>
+</body>
+</html>
